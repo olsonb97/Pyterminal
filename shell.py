@@ -1,28 +1,33 @@
 import subprocess
-import shlex
 import os
+
+initial_dir = os.getcwd()
+
+def initialize_session():
+    return initial_dir
 
 def run_shell_command(session, command):
     try:
-        shlex_command = shlex.split(command)
         new_session = session
+        output = ""
         if command.startswith('cd'):
             new_session, output = change_directory(session, command)
         else:
-            output = subprocess.check_output(shlex_command, cwd=session, stderr=subprocess.STDOUT, shell=False, text=True).rstrip()
-    except subprocess.CalledProcessError as e:
-        output = e.output.rstrip()
+            output = subprocess.check_output(command, cwd=session, stderr=subprocess.STDOUT, shell=True, text=True).rstrip()
+    except subprocess.SubprocessError as e:
+        output = f"Command execution error: {e}"
+    except Exception as e:
+        output = f"Unexpected error: {e}"
     return new_session, output
-
-def initialize_shell():
-    return os.getcwd()
 
 def change_directory(session, command):
     path = command.split('cd', 1)[1].strip()
-    try:
-        os.chdir(os.path.join(session, path))
-        session = os.getcwd()
+    new_path = os.path.join(session, path)
+    normalized_path = os.path.normpath(new_path)
+
+    if os.path.isdir(normalized_path) and os.path.exists(normalized_path):
+        session = normalized_path
         output = f"Changed directory to {session}"
-    except OSError as e:
-        output = f"Error: {e.strerror}"
-    return session, output 
+    else:
+        output = "Invalid directory"
+    return session, output
