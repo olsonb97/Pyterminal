@@ -108,7 +108,7 @@ class Terminal:
                     port = ssh_port_entry.get()
                     new_session = ssh.initialize_session(username, hostname, password, port)
                 elif session_type_var.get() == "Shell":
-                    new_session = shell.initialize_session
+                    new_session = shell.initialize_session()
 
                 self.initialize_session(new_session)
 
