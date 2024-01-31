@@ -3,10 +3,10 @@ import os
 
 initial_dir = os.getcwd()
 
-def initialize_session():
+def new_session():
     return initial_dir
 
-def run_shell_command(session, command):
+def run_command(session, command):
     try:
         new_session = session
         output = ""

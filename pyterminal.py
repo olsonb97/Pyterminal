@@ -7,7 +7,7 @@ class Terminal:
     def __init__(self):
 
         # Initialize the application
-        self.session = shell.initialize_session()
+        self.session = shell.new_session()
         self.session_type = "Shell"
         self.initialize_ui()
 
@@ -101,16 +101,16 @@ class Terminal:
         # Change Session type on clicking OK button
         def on_ok():
             try:
+                if self.session_type == "SSH":
+                    self.session.close()
                 if session_type_var.get() == "SSH":
                     username = ssh_username_entry.get()
                     hostname = ssh_hostname_entry.get()
                     password = ssh_password_entry.get()
                     port = ssh_port_entry.get()
-                    new_session = ssh.initialize_session(username, hostname, password, port)
+                    self.initialize_session("SSH", ssh.new_session(username, hostname, password, port))
                 elif session_type_var.get() == "Shell":
-                    new_session = shell.initialize_session()
-
-                self.initialize_session(new_session)
+                    self.initialize_session("Shell", shell.new_session())
 
             except Exception as e:
                 error_window = tk.Toplevel(self.root)
@@ -134,16 +134,18 @@ class Terminal:
     def execute_command(self, event=None):
         command = self.get_command_entry()
         try:
-            if self.session_type == "Shell":
-                session, output = shell.run_shell_command(self.session, command)
-                self.session = session
+            if self.session_type == "SSH":
+                session, output = ssh.run_command(self.session, command)
+            elif self.session_type == "Shell":
+                session, output = shell.run_command(self.session, command)
+            self.session = session
             self.update_text_box(f"> {command}\n"+(f"{output}\n" if output else ""))
         except Exception as e:
             output = f"Error executing command: {e}"
     
-    def initialize_session(self, session):
+    def initialize_session(self, session_type, session):
+        self.session_type = session_type
         self.session = session
-        self.session_type = "Shell"
         self.update_text_box(f"New Shell Started: {self.session}")
         self.update_session_label()
 
