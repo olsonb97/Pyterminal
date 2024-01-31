@@ -126,11 +126,13 @@ class Terminal:
         ok_button = tk.Button(new_session_window, text="OK", command=on_ok)
         ok_button.pack(padx=10, pady=10)
 
+    # return and delete the entry box
     def get_command_entry(self):
         command = self.command_box.get().strip()
         self.command_box.delete(0, tk.END)
         return command
 
+    # sends command based on session_type
     def execute_command(self, event=None):
         command = self.get_command_entry()
         try:
@@ -143,12 +145,14 @@ class Terminal:
         except Exception as e:
             output = f"Error executing command: {e}"
     
+    # change local variables to account for new session
     def initialize_session(self, session_type, session):
         self.session_type = session_type
         self.session = session
         self.update_text_box(f"New Shell Started: {self.session}")
         self.update_session_label()
 
+    # update text box with outputs and keep it disabled
     def update_text_box(self, output):
         self.text_box.config(state='normal')
         self.text_box.insert(tk.END, output)
@@ -156,9 +160,11 @@ class Terminal:
         self.text_box.config(state='disabled')
         self.update_session_label()
 
+    # update the session_label widget to reflect session_type
     def update_session_label(self):
         self.session_label.config(text=self.session_type)
 
+    # main loop
     def run(self):
         self.root.mainloop()
 

@@ -3,9 +3,11 @@ import os
 
 initial_dir = os.getcwd()
 
+# return the initial dir
 def new_session():
     return initial_dir
 
+# execute command based on command parameter
 def run_command(session, command):
     try:
         new_session = session
@@ -20,6 +22,7 @@ def run_command(session, command):
         output = f"Unexpected error: {e}"
     return new_session, output
 
+# change directories to mimic a stateful connection
 def change_directory(session, command):
     path = command.split('cd', 1)[1].strip()
     new_path = os.path.join(session, path)
